@@ -1,32 +1,52 @@
-
 import { useState } from 'react';
 
 export default function Login() {
-  const [user, setUser] = useState('');
-  const [pass, setPass] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
+      body: JSON.stringify({ username, password }),
     });
-    const data = await res.json();
-    if (data.success) {
-      window.location.href = '/dashboard';
+
+    if (res.ok) {
+      alert('Login realizado com sucesso!');
+      // Redirecionar para o painel ou dashboard
     } else {
-      setError('Usuário ou senha incorretos');
+      const data = await res.json();
+      setError(data.message || 'Erro ao fazer login');
     }
   };
 
   return (
-    <div style={{ background: '#111', color: 'white', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <h1 style={{ color: 'turquoise' }}>Petskão - Login</h1>
-      <input placeholder="Usuário" value={user} onChange={e => setUser(e.target.value)} />
-      <input placeholder="Senha" type="password" value={pass} onChange={e => setPass(e.target.value)} />
-      <button onClick={handleLogin} style={{ background: 'black', color: 'white', marginTop: '1rem' }}>Entrar</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-2xl shadow-md w-full max-w-sm">
+        <h1 className="text-2xl font-bold mb-6 text-center text-cyan-400">Login Petskão</h1>
+        <input
+          type="text"
+          placeholder="Usuário"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
+          required
+        />
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <button type="submit" className="w-full bg-white text-black font-semibold py-2 rounded hover:bg-cyan-400 hover:text-white transition">
+          Entrar
+        </button>
+      </form>
     </div>
   );
 }
